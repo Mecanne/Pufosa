@@ -1,9 +1,26 @@
 <?php
 
-    function printBarra(){
+    $conexion = conectar("pufosa");
+    
+    function imprimirBarra(){
         echo '<div class="logout-nav">
             <img src="img/logo2.png" alt="logo de la empresa">
             <a href="logout.php">Cerrar Sesión</a>
+        </div>';
+    }
+
+    function imprimirBarraTabla($admin){
+        echo '<div class="logout-nav">
+            <a href="../menu.php"><img src="../img/logo2.png" alt="logo de la empresa"></a>';
+            if($admin){
+                echo '<a href="clientes.php">Clientes</a>
+                <a href="empleados.php">Empleados</a>
+                <a href="trabajos.php">Trabajos</a>
+                <a href="departamentos.php">Departamentos</a>
+                <a href="ubicaciones.php">Ubicaciones</a>';
+            }
+            
+            echo '<a href="../logout.php">Cerrar Sesión</a>
         </div>';
     }
 
@@ -44,8 +61,11 @@
                     <th>Codigo Postal</th>
                     <th>Codigo de Area</th>
                     <th>Telefono</th>
+                    <th>Vendedor</th>
                     <th>Limite_de_credito</th>";
                 while($reg = mysqli_fetch_array($registros)){
+                    $vendedor = mysqli_query($conexion,"select Nombre,Apellido from empleados where empleado_ID = '".$reg['Vendedor_ID']."'");
+                    $ven = mysqli_fetch_array($vendedor);
                     echo "<tr>";
                     echo //"<td>".$reg['CLIENTE_ID']."</td>
                         "<td>".$reg['nombre']."</td>
@@ -55,6 +75,7 @@
                         <td>".$reg['CodigoPostal']."</td>
                         <td>".$reg['CodigoDeArea']."</td>
                         <td>".$reg['Telefono']."</td>
+                        <td>".$ven['Nombre']." ".$ven['Apellido']."</td>
                         <td>".$reg['Limite_De_Credito']."</td>";
                     echo "</tr>";
                 }
@@ -63,28 +84,36 @@
             case "emp":
                 $registros = mysqli_query($conexion,$select) or die("Problemas en el select");
                 echo "<table border=3 style='border-collapse: collapse'>";
-                echo "<th>Empleado_ID</th>
-                    <th>Apellido</th>
+                echo //"<th>Empleado_ID</th>
+                    "<th>Apellido</th>
                     <th>Nombre</th>
                     <th>Inicial del segundo apellido</th>
-                    <th>Trabajo_ID</th>
-                    <th>Jefe_ID</th>
+                    <th>Trabajo</th>
+                    <th>Jefe</th>
                     <th>Fecha_contrato</th>
                     <th>Salario</th>
                     <th>Comision</th>
-                    <th>Departamento_ID</th>";
+                    <th>Departamento<th>";
                 while($reg = mysqli_fetch_array($registros)){
+                    $departamento = select("select Funcion,departamento.Nombre as DepNombre
+                                            from trabajos inner join departamento, empleados
+                                            where trabajos.Trabajo_ID = empleados.Trabajo_ID
+                                                and departamento.departamento_ID = empleados.Departamento_ID
+                                                and empleado_ID = '".$reg['empleado_ID']."'");
+                    $dep = mysqli_fetch_array($departamento);
+                    $jefe =  select("select Nombre,Apellido from empleados where empleado_ID = '".$reg['Jefe_ID']."'");
+                    $jef = mysqli_fetch_array($jefe);
                     echo "<tr>";
-                    echo "<td>".$reg['empleado_ID']."</td>
-                        <td>".$reg['Apellido']."</td>
+                    echo //<td>".$reg['empleado_ID']."</td>
+                        "<td>".$reg['Apellido']."</td>
                         <td>".$reg['Nombre']."</td>
                         <td>".$reg['Inicial_del_segundo_apellido']."</td>
-                        <td>".$reg['Trabajo_ID']."</td>
-                        <td>".$reg['Jefe_ID']."</td>
+                        <td>".$dep['Funcion']."</td>
+                        <td>".$jef['Nombre']." ".$jef['Apellido']."</td>
                         <td>".$reg['Fecha_contrato']."</td>
                         <td>".$reg['Salario']."</td>
                         <td>".$reg['Comision']."</td>
-                        <td>".$reg['Departamento_ID']."</td>";
+                        <td>".$dep['DepNombre']."</td>";
                     echo "</tr>";
                 }
                 echo "</table>";
@@ -92,12 +121,12 @@
             case "tra":
                 $registros = mysqli_query($conexion,$select) or die("Problemas en el select");
                 echo "<table border=3 style='border-collapse: collapse'>";
-                echo "<th>Trabajo_ID</th>
-                    <th>Función</th>";
+                echo //"<th>Trabajo_ID</th>
+                    "<th>Función</th>";
                 while($reg = mysqli_fetch_array($registros)){
                     echo "<tr>";
-                    echo "<td>".$reg['Trabajo_ID']."</td>
-                        <td>".$reg['Funcion']."</td>";
+                    echo //"<td>".$reg['Trabajo_ID']."</td>
+                        "<td>".$reg['Funcion']."</td>";
                     echo "</tr>";
                 }
                 echo "</table>";
@@ -110,9 +139,9 @@
                     <th>Ubicacion_ID</th>";
                 while($reg = mysqli_fetch_array($registros)){
                     echo "<tr>";
-                    echo "<td>".$reg['departamento_ID']."</td>
-                        <td>".$reg['Nombre']."</td>
-                        <td>".$reg['Ubicacion_ID']."</td>";
+                    echo //"<td>".$reg['departamento_ID']."</td>
+                        "<td>".$reg['Nombre']."</td>
+                        <td>".$ubi['GrupoRegional']."</td>";
                     echo "</tr>";
                 }
                 echo "</table>";
@@ -132,6 +161,7 @@
                 break;
         }
         echo '</div>';
+        mysqli_close($conexion);
     }
 
     /**
@@ -220,21 +250,52 @@
         $conexion = conectar("pufosa");
         $filtros = getHeaders($opcion);
         echo '<div class="table-container">';
-        echo '<form method="GET" action="ver.php"';
         echo "<span> Filtrar por: </span>";
-        echo '<select name="filtro">';
-        for($i = 0; $i < sizeOf($filtros); $i++){
-            echo '<option value="'.$filtros[$i].'">'.ucfirst($filtros[$i]).'</option>';
-        }
-        echo "</select>&nbsp;";
+        echo '<form method="pos" action="clientes.php">';
+            echo '<select name="filtro">';
+            for($i = 0; $i < sizeOf($filtros); $i++){
+                echo '<option value="'.$filtros[$i].'">'.ucfirst($filtros[$i]).'</option>';
+            }
+            echo "</select>&nbsp;";
         echo '<input type="text" name="valor" value="" required> ';
         echo '<input type="submit" value="Filtrar">';
-        echo '<input type="hidden" name="opcion" value='.$opcion.'>';
         echo "</form>";
         echo '</div>';
         echo "<hr>";
     }
 
+    function añadirModal($tabla){
+        switch($tabla){
+            case 'cli':
+                echo '<div class="add" id="add">
+                        <div class="add-content">
+                            <form action="add.php" method="POST">
+                                <h2 style="text-align: center;">Añadir cliente</h2>
+                                ';
+                                    $headers = getHeaders("cli");
+                                    for($i = 0; $i < sizeOf($headers); $i++){
+                                        echo ucfirst($headers[$i]);
+                                        echo "<br>";
+                                        if($headers[$i] == "Vendedor"){
+                                            echo crearSelect("empleados","Nombre");
+                                        }else{
+                                            echo '<input type="text" name="'.$headers[$i].'" required>';
+                                        }
+                                        echo "<br>";
+                                    }
+                                    echo '<input type="hidden" name="tabla" value="clientes">';
+                                echo '
+                                <hr>
+                                <div class="modal-button">
+                                    <input type="submit" value="Añadir">
+                                    <button class="cerrar" id="boton">Cancelar</button>
+                                </div>
+                            </form>
+                        </div>
+                </div>';
+            break;
+        }
+    }
     /**
      * Array que contiene el nombre de las columnas dependiendo de la tabla indicada en el parametro
      * Valores posibles => {cli, emp, tra, dep, ubi}
@@ -242,7 +303,7 @@
     function getHeaders($tabla){
         switch($tabla){
             case "cli":
-                $arr = ["nombre","Direccion","Ciudad","Estado","CodigoPostal","CodigoDeArea","Telefono","Vendedor_ID","Limite_De_Credito"];
+                $arr = ["nombre","Direccion","Ciudad","Estado","CodigoPostal","CodigoDeArea","Telefono","Vendedor","Limite_De_Credito"];
                 break;
             case "emp":
                 $arr = ["Apellido","Nombre","Inicial_del_segundo_apellido","Trabajo_ID","Jefe_ID","Fecha_contratacion","Salario","Comision","Departamento_ID"];
@@ -274,16 +335,19 @@
             echo '<option value='.$reg[$campo].'>'.$reg[$campo].'</option>';
         }
         echo "</select>";
+        mysqli_close($conexion);
     }
 
     function select($consulta){
         $conexion = conectar("pufosa");
         $consulta = mysqli_query($conexion,$consulta) or die("Problemas con el select: ".mysqli_error($conexion));
         return $consulta;
+        mysqli_close($conexion);
     }
 
     function consulta($consulta){
         $conexion = conectar("pufosa");
         mysqli_query($conexion,$consulta) or die("Problemas con el select: ".mysqli_error($conexion));
+        mysqli_close($conexion);
     }
 ?>

@@ -23,9 +23,7 @@ p{
     padding: 60px;
 }
 
-.container2{
-    margin: auto;
-}
+
 
 .logout-nav{
     display: flex;
@@ -50,6 +48,7 @@ p{
     text-decoration: none;
     font-size: 16px;
     opacity: 0.85;
+    font-weight: bold;
 }
 
 .logout-nav a:hover{

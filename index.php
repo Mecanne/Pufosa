@@ -27,10 +27,6 @@
                 <span><strong>ID del empleado</strong></span><br>
                 <input type="text" name="user_id" size="40" required>
             </div>
-            <div>
-                <span><strong>Contraseña</strong></span><br>
-                <input type="password" name="user_pwd" size="40">
-            </div>
             <button class="btn" onclick="this.form.submit()">Acceder</button>
         </form>
     </div>

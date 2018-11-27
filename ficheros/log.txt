@@ -1,0 +1,5 @@
+2018-11-23 21:07:22 : El empleado FRANCIS KING A ha añadido el cliente "SPORTMANIA".
+2018-11-23 21:26:28 : El empleado DARIO SCOTT T ha borrado el cliente "D".
+2018-11-24 17:24:06 : El empleado FRANCIS KING A ha modificado el cliente "AL AND BOB'S SPORTS".
+2018-11-24 23:24:37 : El empleado FRANCIS KING A ha modificado el cliente "NOMBRE".
+2018-11-24 23:24:54 : El empleado FRANCIS KING A ha borrado el cliente "NOMBRE".

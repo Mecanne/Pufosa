@@ -42,7 +42,7 @@
                                 <li><a href="../tablas/departamentos.php">Departamentos</a></li>
                                 <li><a href="../tablas/ubicaciones.php">Ubicaciones</a></li>
                                 <li><a href="../operaciones/log.php" target="_blank">Log</a></li>
-                                <li><a href="../operaciones/informe.php">Informe</a></li>
+                                <li><a href="../tablas/informe.php">Informe</a></li>
                             </ul>
                             <ul class="nav navbar-nav navbar-right">
                                 <li><a style="color: white;" href="../operaciones/logout.php">Cerrar sesión</a></li>

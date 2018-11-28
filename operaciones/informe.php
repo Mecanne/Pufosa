@@ -3,6 +3,7 @@
         if(!isset($_SESSION['emp_id'])) header("Location: ../index.php");
         require_once("../funciones.php");
         $conexion = conectar("pufosa");
+        // Comprobams que el usuario es presidente, y, si es asi, le damos acceso.
         switch(comprobarAcceso($conexion,$_SESSION['emp_id'])){
             case 2:
                 break;
@@ -33,23 +34,28 @@
     <div class="container-fluid">
 
     <?php 
-
         imprimirBarra($conexion,$_SESSION['emp_id']);
         echo '<h2>Informe de departamentos</h2><hr>';
-        $trabajo = mysqli_query($conexion,"select Trabajo_ID from empleados where empleado_ID = '".$_SESSION['emp_id']."'");
-        $trabajo = mysqli_fetch_row($trabajo)[0];
-        if($trabajo == '672'){
-            $registros = mysqli_query($conexion,"SELECT departamento.Nombre, GrupoRegional, COUNT(empleado_ID) as cantidad, MIN(salario) as minimo, AVG(salario) as medio, MAX(salario) as maximo
-                                                FROM empleados
-                                                INNER JOIN departamento
-                                                ON departamento.departamento_ID = empleados.Departamento_ID
-                                                INNER JOIN ubicacion
-                                                ON ubicacion.Ubicacion_ID = departamento.Ubicacion_ID
-                                                GROUP BY empleados.Departamento_ID
-                                                ORDER BY ubicacion.GrupoRegional ASC");
-            if(!empty($registros)){
-                echo '
-                <table class="table table-striped table-hover">
+
+        $registros = mysqli_query($conexion,"SELECT departamento.Nombre, GrupoRegional, COUNT(empleado_ID) as cantidad, MIN(salario) as minimo, AVG(salario) as medio, MAX(salario) as maximo
+                                            FROM empleados
+                                            INNER JOIN departamento
+                                            ON departamento.departamento_ID = empleados.Departamento_ID
+                                            INNER JOIN ubicacion
+                                            ON ubicacion.Ubicacion_ID = departamento.Ubicacion_ID
+                                            GROUP BY empleados.Departamento_ID
+                                            ORDER BY departamento.Nombre ASC");
+        
+        if(!empty($registros)){
+            echo '
+            <hr>
+                <div class="container">
+                    <input class="form-control" id="myInput" type="text" placeholder="Buscar..">
+                    <br>
+                </div>
+            <hr>
+            <table class="table table-striped table-hover">
+                <thead>
                     <tr style="background-color: rgba(0,0,0,0.85);color:white;">
                         <th>Departamento</th>
                         <th>Ubicacion</th>
@@ -58,10 +64,12 @@
                         <th>Sueldo medio</th>
                         <th>Sueldo maximo</th>
                     </tr>
-                ';
-            }
+                </thead>
+            ';
+        
             while($departamento = mysqli_fetch_array($registros)){
                 echo '
+                <tbody id="tablaDatos">
                     <tr>
                         <td>'.ucfirst($departamento['Nombre']).'</td>
                         <td>'.$departamento['GrupoRegional'].'</td>
@@ -70,15 +78,27 @@
                         <td>'.$departamento['medio'].'</td>
                         <td>'.$departamento['maximo'].'</td>
                     </tr>
+                </tbody>
                 ';
             }
-            echo '</table>';
-            mysqli_close($conexion);
-        }else{
-            mysqli_close($conexion);
-            header("Location: ../menu.php");
-        }
+        echo '</table>';
+        mysqli_close($conexion);
+    }else{
+        mysqli_close($conexion);
+        header("Location: ../menu.php");
+    }
+        
     ?>
     </div>
+    <script>
+        $(document).ready(function(){
+            $("#myInput").on("keyup", function() {
+                var value = $(this).val().toLowerCase();
+                    $("#tablaDatos tr").filter(function() {
+                    $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+                });
+            });
+        });
+    </script> 
 </body>
 </html>

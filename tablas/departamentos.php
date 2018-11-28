@@ -45,7 +45,8 @@
          * Analizamos si se ha añadido, borrado o modificado un dato de la tabla.
          */
         if(isset($_REQUEST['añadido'])){
-            echo '<div class="container alert alert-success" id="añadir">¡Departamento <strong>añadido</strong> con exito!</div>';
+            if ($_REQUEST['añadido'] == 1) echo '<div class="container alert alert-success" id="añadir">¡Departamento <strong>añadido</strong> con exito!</div>';
+            else echo '<div class="container alert alert-danger" id="añadir">No se ha podido añadir el departamento.</div>';
             ?>
                 <script>ocultar("añadir")</script>
             <?php
@@ -57,7 +58,8 @@
             <?php
         }
         if(isset($_REQUEST['borrado'])){
-            echo '<div class="container alert alert-success" id="borrar">¡Departamento <strong>borrado</strong> con exito!</div>';
+            if ($_REQUEST['borrado'] == 1) echo '<div class="container alert alert-success" id="borrar">¡Departamento <strong>borrado</strong> con exito!</div>';
+            else echo '<div class="container alert alert-danger" id="borrar">No se ha podido borrar el departamento</div>';
             ?>
                 <script>ocultar("borrar")</script>
             <?php

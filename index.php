@@ -1,7 +1,11 @@
+
+
 <?php
 /**
- * Si ya hay una sesion, redirigirá al menu y alli cargará todo a traves de la sesion.
+ * Realizado por DANIEL DIAZ NAVAS
  */
+
+    // Si ya hay una sesion, redirigirá al menu y alli cargará todo a traves de la sesion.
     session_start();
     if(isset($_SESSION['emp_id'])){
         header("Location: menu.php");
